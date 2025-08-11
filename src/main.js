@@ -42,10 +42,15 @@ const scene = new THREE.Scene();
 function updateCameraAndRendererSize() {
   const width = canvasEl.clientWidth;
   const height = canvasEl.clientHeight;
-  camera.aspect = width / height;
+  camera.aspect = width / height; // Update aspect ratio
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
 }
+
+window.addEventListener('resize', () => {
+  updateCameraAndRendererSize();
+});
+
 
 const camera = new THREE.PerspectiveCamera(75, canvasEl.clientWidth / canvasEl.clientHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true });
@@ -130,7 +135,7 @@ function handleGLTFLoad(gltf) {
         camera.position.copy(cam.position);
         camera.quaternion.copy(cam.quaternion);
         camera.fov = cam.fov || camera.fov;
-        camera.aspect = cam.aspect || camera.aspect;
+    camera.aspect = canvasEl.clientWidth / canvasEl.clientHeight; // Always update aspect ratio
         camera.near = cam.near || camera.near;
         camera.far = cam.far || camera.far;
         camera.updateProjectionMatrix();
@@ -156,7 +161,7 @@ function handleGLTFLoad(gltf) {
     camera.position.copy(embeddedCameras[0].position);
     camera.quaternion.copy(embeddedCameras[0].quaternion);
     camera.fov = embeddedCameras[0].fov || camera.fov;
-    camera.aspect = embeddedCameras[0].aspect || camera.aspect;
+  camera.aspect = canvasEl.clientWidth / canvasEl.clientHeight; // Update aspect ratio
     camera.near = embeddedCameras[0].near || camera.near;
     camera.far = embeddedCameras[0].far || camera.far;
     camera.updateProjectionMatrix();
