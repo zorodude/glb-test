@@ -110,20 +110,83 @@ function handleGLTFLoad(gltf) {
   // Store original pose for reset
   storeOriginalPose(model);
   scene.add(model);
-  // Compute bounding box and fit camera
-  const box = new THREE.Box3().setFromObject(model);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-  // Calculate distance from center so model fits in view
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const fov = camera.fov * (Math.PI / 180);
-  let distance = maxDim / (2 * Math.tan(fov / 2));
-  distance *= 1.5; // Add some padding
-  // Set camera position
-  camera.position.set(center.x, center.y + maxDim * 0.2, center.z + distance);
-  camera.lookAt(center);
-  controls.target.copy(center);
-  controls.update();
+
+  // Camera detection and UI
+  const cameraDiv = document.getElementById('cameras');
+  cameraDiv.innerHTML = '';
+  let embeddedCameras = [];
+  model.traverse(obj => {
+    if (obj.isCamera) embeddedCameras.push(obj);
+  });
+  if (embeddedCameras.length === 0) {
+    cameraDiv.textContent = 'no cameras detected...';
+  } else {
+    let activeCamBtn = null;
+    embeddedCameras.forEach((cam, idx) => {
+      const btn = document.createElement('button');
+      btn.innerText = cam.name || `Camera ${idx + 1}`;
+      btn.onclick = () => {
+        // Copy camera parameters, but keep OrbitControls hooked up
+        camera.position.copy(cam.position);
+        camera.quaternion.copy(cam.quaternion);
+        camera.fov = cam.fov || camera.fov;
+        camera.aspect = cam.aspect || camera.aspect;
+        camera.near = cam.near || camera.near;
+        camera.far = cam.far || camera.far;
+        camera.updateProjectionMatrix();
+        // Keep controls attached, but update target to camera's look direction if available
+        if (cam.target) {
+          console.log('there is a cam.target')
+          controls.target.copy(cam.target);
+        } else {
+          // Try to set target in front of camera
+          console.log('setting target forward');
+          const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion).add(cam.position);
+          controls.target.copy(forward);
+        }
+        controls.update();
+        if (activeCamBtn) activeCamBtn.classList.remove('active');
+        btn.classList.add('active');
+        activeCamBtn = btn;
+      };
+      cameraDiv.appendChild(btn);
+    });
+    // Use first camera by default, but keep OrbitControls
+    embeddedCameras[0].updateMatrixWorld();
+    camera.position.copy(embeddedCameras[0].position);
+    camera.quaternion.copy(embeddedCameras[0].quaternion);
+    camera.fov = embeddedCameras[0].fov || camera.fov;
+    camera.aspect = embeddedCameras[0].aspect || camera.aspect;
+    camera.near = embeddedCameras[0].near || camera.near;
+    camera.far = embeddedCameras[0].far || camera.far;
+    camera.updateProjectionMatrix();
+    if (embeddedCameras[0].target) {
+      console.log('embeddedCameras[0].target')
+      controls.target.copy(embeddedCameras[0].target);
+    } else {
+      console.log('default: setting target forward')
+      const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(embeddedCameras[0].quaternion).add(embeddedCameras[0].position);
+      controls.target.copy(forward);
+    }
+    controls.update();
+    cameraDiv.firstChild.classList.add('active');
+  }
+
+  // Compute bounding box and fit camera (if no embedded camera)
+  if (embeddedCameras.length === 0) {
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    let distance = maxDim / (2 * Math.tan(fov / 2));
+    distance *= 1.5; // Add some padding
+    camera.position.set(center.x, center.y + maxDim * 0.2, center.z + distance);
+    camera.lookAt(center);
+    controls.target.copy(center);
+    controls.update();
+  }
+
   mixer = new THREE.AnimationMixer(model);
   animations = gltf.animations;
   console.log('animations:', animations)

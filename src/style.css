@@ -45,15 +45,32 @@ canvas {
   -webkit-user-drag: none;
 }
 
-.info-1 {
-  max-width: 400px;
+.info-wrapper{
+  display:flex;
+  width: 100%;
+  flex-wrap: wrap;
+  flex-direction: row;
 }
 
-.info-2 {
-  border: 1px solid grey;
+.info{
+  /* border: 1px solid grey; */
   border-radius: 20px;
   padding: 2em;
   overflow: auto;
+  /* margin: 1em 2em; */
+}
+
+.info-1, .info-2 {
+  width: 50%;
+  flex: 1 0 50%;
+}
+
+.info-2 { 
+}
+
+.info-3{
+  flex-basis: 100%;
+
 }
 
 .samples{

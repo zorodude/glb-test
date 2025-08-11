@@ -10,27 +10,35 @@
   <body>
     <div class="wrapper">
       <canvas id="scene"></canvas>
-
-      <div class="info-1">
-        <h3>Animations:</h3>
-        <div id="ui">no animations detected...</div>
-        <button id="reset-btn" style="margin-bottom:2em;">Reset Pose</button>
+      
+      <div class="info-wrapper">
+        
+        <div class="info info-1">
+          <h3>Animations:</h3>
+          <div id="ui">no animations detected...</div>
+          <button id="reset-btn" style="margin-bottom:2em;">Reset Pose</button>
         </div>
 
-      <div class="info-2">
-        <div class="structure-container">
-          <h3>Structure:</h3>
-          <div class="structure"></div>
+        <div class="info info-2">
+          <h3>Cameras:</h3>
+          <div id="cameras"></div>
         </div>
+
+        <div class="info info-3">
+          <div class="structure-container">
+            <h3>Structure:</h3>
+            <div class="structure"></div>
+          </div>
+        </div>
+
+        <div class="info info-4">
+          <div class="samples">
+            <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models" target="_blank">Get samples here.</a>
+          </div>
+        </div>
+
       </div>
 
-      <div class="info-3">
-        <div class="samples">
-          <a href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models" target="_blank">Get samples here.</a>
-        </div>
-      </div>
-
-    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
