@@ -3,9 +3,33 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const canvasEl = document.querySelector('#scene')
+const canvasSizeEl = document.getElementById('current-canvas-size');
 
 // Create drag-and-drop message overlay
 let dropMsg = document.createElement('div');
+
+let isFixedSize = false;
+
+function setCanvasSize() {
+  if (isFixedSize) {
+    canvasEl.width = 1024;
+    canvasEl.height = 600;
+    canvasEl.style.width = '1024px';
+    canvasEl.style.height = '600px';
+  } else {
+    canvasEl.width = canvasEl.clientWidth;
+    canvasEl.height = canvasEl.clientHeight;
+    canvasEl.style.width = '';
+    canvasEl.style.height = '';
+  }
+  updateCameraAndRendererSize();
+  canvasSizeEl.innerText = canvasEl.width + " x " + canvasEl.height;
+}
+
+document.getElementById('toggle-canvas-size').onclick = function() {
+  isFixedSize = !isFixedSize;
+  setCanvasSize();
+};
 dropMsg.id = 'drop-message';
 dropMsg.textContent = 'Drag and drop a .glb or .gltf file to load';
 Object.assign(dropMsg.style, {
@@ -40,21 +64,27 @@ canvasEl.addEventListener('mousedown', (e) => e.preventDefault());
 const scene = new THREE.Scene();
 
 function updateCameraAndRendererSize() {
-  const width = canvasEl.clientWidth;
-  const height = canvasEl.clientHeight;
-  camera.aspect = width / height; // Update aspect ratio
+  let width, height;
+  if (isFixedSize) {
+    width = 1024;
+    height = 600;
+  } else {
+    width = canvasEl.clientWidth;
+    height = canvasEl.clientHeight;
+  }
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
 }
 
 window.addEventListener('resize', () => {
-  updateCameraAndRendererSize();
+  if (!isFixedSize) updateCameraAndRendererSize();
 });
 
 
 const camera = new THREE.PerspectiveCamera(75, canvasEl.clientWidth / canvasEl.clientHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true });
-updateCameraAndRendererSize();
+setCanvasSize();
 
 window.addEventListener('resize', updateCameraAndRendererSize);
 

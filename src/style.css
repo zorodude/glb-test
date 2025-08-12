@@ -60,6 +60,10 @@ canvas {
   /* margin: 1em 2em; */
 }
 
+.full{
+  width:100%;
+}
+
 .info-1, .info-2 {
   width: 50%;
   flex: 1 0 50%;
@@ -103,6 +107,10 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+#toggle-canvas-size {
+  max-width: 200px;
 }
 
 @media (prefers-color-scheme: light) {
